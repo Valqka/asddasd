@@ -1,0 +1,78 @@
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+int tempSensorPin = A0;
+int fanCoolerPin = 10;
+int blueLEDPin = 7;
+int redLEDPin = 13;
+int yellowLEDPin = 6;
+int switchPin = 9;
+
+void setup() {
+  Serial.begin(9600);
+  lcd.begin(16, 2);
+  pinMode(switchPin, INPUT);
+  pinMode(tempSensorPin, INPUT);
+  pinMode(fanCoolerPin, OUTPUT);
+  pinMode(blueLEDPin, OUTPUT);
+  pinMode(redLEDPin, OUTPUT);
+  pinMode(yellowLEDPin, OUTPUT);
+}
+
+
+void loop() {
+   int switchState = digitalRead(switchPin);
+  if (switchState == 1) {
+      digitalWrite(fanCoolerPin, HIGH);
+      digitalWrite(yellowLEDPin, HIGH);
+      digitalWrite(blueLEDPin, LOW);
+      digitalWrite(redLEDPin, LOW);
+      lcd.setCursor(0, 0);
+      lcd.print("Fan mode active ");
+  } else {
+  float tempValue = analogRead(tempSensorPin);
+  float cel = (tempValue * 5.0 / 1024.0) - 0.5; 
+  cel = cel / 0.01;
+  if(tempValue > 154){
+     lcd.setCursor(0, 0);
+     lcd.print(cel);
+     lcd.print("  deg.C.   ");
+     digitalWrite(fanCoolerPin, HIGH);
+     digitalWrite(blueLEDPin, HIGH);
+     digitalWrite(redLEDPin, LOW);
+     digitalWrite(yellowLEDPin, HIGH);
+     //delay(5000);
+     //sleep();
+  }else if(tempValue < 134){
+     lcd.setCursor(0, 0);
+     lcd.print(cel);
+     lcd.print("  deg.C.   ");
+     digitalWrite(fanCoolerPin, HIGH);
+     digitalWrite(blueLEDPin, LOW);
+     digitalWrite(redLEDPin, HIGH);
+     digitalWrite(yellowLEDPin, HIGH);
+     //delay(10000);
+     //sleep();
+  }else{
+     lcd.setCursor(0, 0);
+     lcd.print(cel);
+     lcd.print("  deg.C.   ");
+     digitalWrite(fanCoolerPin, LOW);
+     digitalWrite(blueLEDPin, LOW);
+     digitalWrite(redLEDPin, LOW);
+     digitalWrite(yellowLEDPin, LOW);
+  }
+ }
+}
+
+void sleep(){
+     lcd.clear();
+     lcd.setCursor(0, 0);
+     lcd.print("Sleeping mode!");
+     digitalWrite(fanCoolerPin, LOW);
+     digitalWrite(blueLEDPin, LOW);
+     digitalWrite(redLEDPin, LOW);
+     digitalWrite(yellowLEDPin, LOW);
+     delay(5000);
+     lcd.clear();
+}
